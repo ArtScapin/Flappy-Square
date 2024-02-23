@@ -1,7 +1,5 @@
 const gravity = 0.04
 const lift = 40
-const maxPosition = 400
-const minPosition = 0
 
 const config = {
   gameArea: {
@@ -78,8 +76,8 @@ function createPipe() {
 function jump() {
   for (const square of squares) {
     square.position += lift
-    if (square.position > maxPosition)
-      square.position = maxPosition
+    if (square.position > config.gameArea.height)
+      square.position = config.gameArea.height
     square.velocity = 0
   }
 }
@@ -87,9 +85,9 @@ function jump() {
 function gravityForce(square) {
   square.velocity += gravity
   square.position -= square.velocity
-  if (square.position < minPosition) {
-    square.position = minPosition
-    square.velocity = 0
+  if (square.position < 0) {
+    square.position = 0
+    square.death = true
   }
 }
 
@@ -97,6 +95,7 @@ document.addEventListener('keydown', jump)
 
 function gameLoop() {
   if (!isGameOver) {
+    isGameOver = true
     const pipe = pipes.find((pipe) => pipe.position < config.square.distance + config.square.size && pipe.position >= config.square.distance - config.pipe.width)
 
     for (const square of squares) {
@@ -109,7 +108,6 @@ function gameLoop() {
           const diff = square.position - pipe.height
           if ((diff <= -(config.pipe.size / 2) || diff >= (config.pipe.size / 2 - config.square.size)) && pipe.position > (config.square.distance - config.pipe.width)) {
             square.death = true
-            isGameOver = true
           }
           if (!square.death && pipe.position <= config.square.distance - config.pipe.width) {
             square.score++
@@ -117,6 +115,10 @@ function gameLoop() {
           }
 
         }
+      }
+
+      if (!square.death) {
+        isGameOver = false
       }
     }
 
