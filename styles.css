@@ -10,15 +10,12 @@ body {
   
   #gameArea {
     position: relative;
-    width: 400px;
-    height: 400px;
     border: 2px solid #000;
     overflow: hidden;
   }
   
   .square {
     position: absolute;
-    left: 50px;
     width: 30px;
     height: 30px;
     margin-top: -15px;
@@ -26,17 +23,27 @@ body {
   
   .pipe {
     position: absolute;
-    width: 50px;
-    height: 100px;
     border-style: solid;
     border-color: black;
   }
-
   
-  #pipe-top {
-    top: 0;
+  #score {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 18px;
   }
-  
-  #pipe-bottom {
-    bottom: 0;
+
+  #newGameBtn {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
   }

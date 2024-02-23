@@ -1,28 +1,50 @@
-const gravity = 0.05
+const gravity = 0.04
 const lift = 40
 const maxPosition = 400
 const minPosition = 0
 
+const config = {
+  gameArea: {
+    width: 800,
+    height: 500,
+  },
+  square: {
+    size: 30,
+    distance: 500,
+  },
+  pipe: {
+    size: 150,
+    width: 70,
+    velocity: 1,
+    distance: 250
+  },
+}
+
 const squares = []
 const pipes = []
 
-
-let isGameOver = false
+let isGameOver = true
 
 const gameArea = document.getElementById('gameArea')
+gameArea.style.width = config.gameArea.width + 'px'
+gameArea.style.height = config.gameArea.height + 'px'
 
-function createSquare() {
+const score = document.getElementById('scoreValue')
+
+function createSquare(color) {
   const square = {
     velocity: 0,
-    position: 200,
-    color: 'red',
+    position: config.gameArea.height / 2,
+    color,
     element: document.createElement('div'),
     death: false,
+    score: 0,
   }
-  
+
   square.element.className = 'square'
   square.element.style.bottom = square.position + 'px'
   square.element.style.backgroundColor = square.color
+  square.element.style.left = config.square.distance + 'px'
 
   gameArea.appendChild(square.element)
 
@@ -31,18 +53,20 @@ function createSquare() {
 
 function createPipe() {
   const pipe = {
-    position: 400,
-    height: Math.floor(Math.random() * (maxPosition - 150)) + 100,
+    position: config.gameArea.width,
+    height: Math.random() * ((config.gameArea.height - 50 - config.pipe.size / 2) - ((config.pipe.size / 2) + 50)) + ((config.pipe.size / 2) + 50),
     element: document.createElement('div'),
   }
-  
+
   pipe.element.className = 'pipe'
-  pipe.element.style.borderBottom = (pipe.height - 50) + 'px'
-  pipe.element.style.borderTop = (350 - pipe.height) + 'px'
+  pipe.element.style.borderBottom = (pipe.height - (config.pipe.size / 2)) + 'px'
+  pipe.element.style.borderTop = ((config.gameArea.height - pipe.height) - (config.pipe.size / 2)) + 'px'
   pipe.element.style.borderLeft = '0px'
   pipe.element.style.borderRight = '0px'
   pipe.element.style.borderStyle = 'solid'
   pipe.element.style.borderColor = 'black'
+  pipe.element.style.height = config.pipe.size + 'px'
+  pipe.element.style.width = config.pipe.width + 'px'
   pipe.element.style.left = pipe.position + 'px'
 
   gameArea.appendChild(pipe.element)
@@ -50,9 +74,7 @@ function createPipe() {
   pipes.push(pipe)
 }
 
-createPipe()
-createSquare()
-
+//refazer
 function jump() {
   for (const square of squares) {
     square.position += lift
@@ -61,60 +83,76 @@ function jump() {
     square.velocity = 0
   }
 }
-  
+
 function gravityForce(square) {
-    square.velocity += gravity
-    square.position -= square.velocity
-    if (square.position < minPosition) {
-      square.position = minPosition
-      square.velocity = 0
-    }
+  square.velocity += gravity
+  square.position -= square.velocity
+  if (square.position < minPosition) {
+    square.position = minPosition
+    square.velocity = 0
+  }
 }
 
 document.addEventListener('keydown', jump)
 
 function gameLoop() {
   if (!isGameOver) {
+    const pipe = pipes.find((pipe) => pipe.position < config.square.distance + config.square.size && pipe.position >= config.square.distance - config.pipe.width)
+
     for (const square of squares) {
-      gravityForce(square)
+      if (!square.death) {
+        gravityForce(square)
 
-      square.element.style.bottom = square.position + 'px'
+        square.element.style.bottom = square.position + 'px'
 
-      const pipe = pipes.find((pipe) => pipe.position < 80)
-      if (pipe) {
-        const diff = square.position - pipe.height
-        if ((diff <= -50 || diff >= 20) && pipe.position > 0  ) {
-          pipe.element.style.borderColor = 'red'
+        if (pipe) {
+          const diff = square.position - pipe.height
+          if ((diff <= -(config.pipe.size / 2) || diff >= (config.pipe.size / 2 - config.square.size)) && pipe.position > (config.square.distance - config.pipe.width)) {
+            square.death = true
+            isGameOver = true
+          }
+          if (!square.death && pipe.position <= config.square.distance - config.pipe.width) {
+            square.score++
+            score.innerText = square.score
+          }
+
         }
-        if(pipe.element.style.borderColor != 'red' && pipe.position <= 0)
-          pipe.element.style.borderColor = 'green'
       }
     }
 
     for (const pipe of pipes) {
-      pipe.position -= 1
+      pipe.position -= config.pipe.velocity
 
-      if (pipe.position == 250)
+      if (pipe.position == config.gameArea.width - config.pipe.distance)
         createPipe()
 
-      if (pipe.position <= -50) {
+      if (pipe.position <= -(config.pipe.width)) {
         pipe.element.remove()
         pipes.shift()
       }
 
       pipe.element.style.left = pipe.position + 'px'
     }
-  
-    requestAnimationFrame(gameLoop);
+
+    requestAnimationFrame(gameLoop)
+  } else {
+    const button = document.createElement('button')
+    button.id = 'newGameBtn'
+    button.innerText = 'New Game'
+    gameArea.append(button)
+    button.onclick = () => {
+      pipes.forEach((pipe) => pipe.element.remove())
+      pipes.forEach(() => pipes.pop())
+      squares.forEach((square) => square.element.remove())
+      squares.forEach(() => squares.pop())
+      isGameOver = false
+      createPipe()
+      createSquare('red')
+      button.remove()
+      score.innerText = 0
+      gameLoop()
+    }
   }
 }
 
-// function gameOver() {
-//   isGameOver = true;
-//   alert('Game Over!');
-//   bird.style.top = '50%';
-//   velocity = 0;
-//   isGameOver = false;
-// }
-
-gameLoop();
+gameLoop()
