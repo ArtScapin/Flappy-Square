@@ -23,6 +23,8 @@ const pipes = []
 
 let isGameOver = true
 
+const gameName = document.getElementById('gameName')
+
 const gameArea = document.getElementById('gameArea')
 gameArea.style.width = config.gameArea.width + 'px'
 gameArea.style.height = config.gameArea.height + 'px'
@@ -52,7 +54,7 @@ function createSquare(color) {
 function createPipe() {
   const pipe = {
     position: config.gameArea.width,
-    height: Math.random() * ((config.gameArea.height - 50 - config.pipe.size / 2) - ((config.pipe.size / 2) + 50)) + ((config.pipe.size / 2) + 50),
+    height: Math.round(Math.random() * ((config.gameArea.height - 50 - config.pipe.size / 2) - ((config.pipe.size / 2) + 50))) + ((config.pipe.size / 2) + 50),
     element: document.createElement('div'),
   }
 
@@ -138,11 +140,13 @@ function gameLoop() {
 
     requestAnimationFrame(gameLoop)
   } else {
+    gameName.style.zIndex = 1
     const button = document.createElement('button')
-    button.id = 'newGameBtn'
-    button.innerText = 'New Game'
+    button.id = 'playBtn'
+    button.innerText = 'Play'
     gameArea.append(button)
     button.onclick = () => {
+      gameName.style.zIndex = 0
       pipes.forEach((pipe) => pipe.element.remove())
       pipes.forEach(() => pipes.pop())
       squares.forEach((square) => square.element.remove())
