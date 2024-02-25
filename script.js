@@ -146,14 +146,15 @@ function gameLoop() {
     button.innerText = 'Play'
     gameArea.append(button)
     button.onclick = () => {
+      console.log({ config, squares, pipes });
       gameName.style.zIndex = 0
       pipes.forEach((pipe) => pipe.element.remove())
-      pipes.forEach(() => pipes.pop())
+      pipes.length = 0
       squares.forEach((square) => square.element.remove())
-      squares.forEach(() => squares.pop())
+      squares.length = 0
       config.global.isGameOver = false
       createPipe()
-      createSquare('red')
+      createSquare('GREEN')
       button.remove()
       score.innerText = 0
       gameLoop()
