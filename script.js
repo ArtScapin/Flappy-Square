@@ -146,7 +146,6 @@ function gameLoop() {
     button.innerText = 'Play'
     gameArea.append(button)
     button.onclick = () => {
-      console.log({ config, squares, pipes });
       gameName.style.zIndex = 0
       pipes.forEach((pipe) => pipe.element.remove())
       pipes.length = 0
