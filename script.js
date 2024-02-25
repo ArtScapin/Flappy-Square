@@ -1,6 +1,3 @@
-const gravity = 0.04
-const lift = 40
-
 const config = {
   gameArea: {
     width: 800,
@@ -14,14 +11,17 @@ const config = {
     size: 150,
     width: 70,
     velocity: 1,
-    distance: 250
+    distance: 250,
   },
+  global: {
+    gravity: 0.04,
+    lift: 40,
+    isGameOver: true,
+  }
 }
 
 const squares = []
 const pipes = []
-
-let isGameOver = true
 
 const gameName = document.getElementById('gameName')
 
@@ -77,7 +77,7 @@ function createPipe() {
 //refazer
 function jump() {
   for (const square of squares) {
-    square.position += lift
+    square.position += config.global.lift
     if (square.position > config.gameArea.height)
       square.position = config.gameArea.height
     square.velocity = 0
@@ -85,7 +85,7 @@ function jump() {
 }
 
 function gravityForce(square) {
-  square.velocity += gravity
+  square.velocity += config.global.gravity
   square.position -= square.velocity
   if (square.position < 0) {
     square.position = 0
@@ -96,8 +96,8 @@ function gravityForce(square) {
 document.addEventListener('keydown', jump)
 
 function gameLoop() {
-  if (!isGameOver) {
-    isGameOver = true
+  if (!config.global.isGameOver) {
+    config.global.isGameOver = true
     const pipe = pipes.find((pipe) => pipe.position < config.square.distance + config.square.size && pipe.position >= config.square.distance - config.pipe.width)
 
     for (const square of squares) {
@@ -120,7 +120,7 @@ function gameLoop() {
       }
 
       if (!square.death) {
-        isGameOver = false
+        config.global.isGameOver = false
       }
     }
 
@@ -151,7 +151,7 @@ function gameLoop() {
       pipes.forEach(() => pipes.pop())
       squares.forEach((square) => square.element.remove())
       squares.forEach(() => squares.pop())
-      isGameOver = false
+      config.global.isGameOver = false
       createPipe()
       createSquare('red')
       button.remove()
