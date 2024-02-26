@@ -4,7 +4,7 @@ const config = {
     height: 500,
   },
   square: {
-    size: 30,
+    size: 40,
     distance: 500,
   },
   pipe: {
@@ -29,6 +29,45 @@ const gameArea = document.getElementById('gameArea')
 gameArea.style.width = config.gameArea.width + 'px'
 gameArea.style.height = config.gameArea.height + 'px'
 
+const playButton = document.getElementById('playBtn')
+playButton.onclick = () => {
+  gameName.style.zIndex = 0
+  pipes.forEach((pipe) => pipe.element.remove())
+  pipes.length = 0
+  squares.forEach((square) => square.element.remove())
+  squares.length = 0
+  config.global.isGameOver = false
+  createPipe()
+  createSquare('GREEN')
+  playButton.style.visibility = 'hidden'
+  configButton.style.visibility = 'hidden'
+  score.innerText = 0
+  gameLoop()
+}
+
+const configButton = document.getElementById('configBtn')
+const configMenu = document.getElementById('configMenu')
+configButton.onclick = () => {
+  configMenu.style.visibility = 'visible'
+}
+const closeMenuConfigBtn = document.getElementById('closeMenuConfigBtn')
+closeMenuConfigBtn.onclick = () => {
+  config.gameArea.width = document.getElementById('gameWidth').value
+  config.gameArea.height = document.getElementById('gameHeight').value
+  // config.square.size = document.getElementById('squareSize').value
+  // config.square.distance = document.getElementById('squareDistance').value
+  // config.pipe.size = document.getElementById('pipeSize').value
+  // config.pipe.width = document.getElementById('pipeWidth').value
+  // config.pipe.velocity = document.getElementById('pipeVelocity').value
+  // config.pipe.distance = document.getElementById('pipeDistance').value
+  // config.global.gravity = document.getElementById('globalGravity').value
+  // config.global.lift = document.getElementById('globalLift').value
+
+  gameArea.style.width = config.gameArea.width + 'px'
+  gameArea.style.height = config.gameArea.height + 'px'
+  configMenu.style.visibility = 'hidden'
+}
+
 const score = document.getElementById('scoreValue')
 
 function createSquare(color) {
@@ -42,6 +81,9 @@ function createSquare(color) {
   }
 
   square.element.className = 'square'
+  square.element.style.width = config.square.size + 'px'
+  square.element.style.height = config.square.size + 'px'
+  square.element.style.marginTop = '-' + config.square.size / 2 + 'px'
   square.element.style.bottom = square.position + 'px'
   square.element.style.backgroundColor = square.color
   square.element.style.left = config.square.distance + 'px'
@@ -141,23 +183,8 @@ function gameLoop() {
     requestAnimationFrame(gameLoop)
   } else {
     gameName.style.zIndex = 1
-    const button = document.createElement('button')
-    button.id = 'playBtn'
-    button.innerText = 'Play'
-    gameArea.append(button)
-    button.onclick = () => {
-      gameName.style.zIndex = 0
-      pipes.forEach((pipe) => pipe.element.remove())
-      pipes.length = 0
-      squares.forEach((square) => square.element.remove())
-      squares.length = 0
-      config.global.isGameOver = false
-      createPipe()
-      createSquare('GREEN')
-      button.remove()
-      score.innerText = 0
-      gameLoop()
-    }
+    playButton.style.visibility = 'visible'
+    configButton.style.visibility = 'visible'
   }
 }
 
