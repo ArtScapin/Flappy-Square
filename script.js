@@ -52,7 +52,7 @@ function startGame() {
   clearElements()
   config.global.isGameOver = false
   createPipe()
-  createSquare('GREEN')
+  createSquare('crimson')
   playButton.style.visibility = 'hidden'
   configButton.style.visibility = 'hidden'
   score.innerText = 0
