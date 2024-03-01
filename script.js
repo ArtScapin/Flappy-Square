@@ -5,7 +5,7 @@ const config = {
   },
   square: {
     size: 40,
-    distance: 500,
+    distance: 200,
   },
   pipe: {
     size: 150,
@@ -40,6 +40,12 @@ configButton.onclick = toggleConfigMenu
 closeMenuConfigBtn.onclick = updateGameConfig
 
 document.addEventListener('keydown', jump)
+document.getElementById('gameWidth').onchange = ({ target }) => {
+  const squareDistance = document.getElementById('squareDistance')
+  const value = squareDistance.value
+  squareDistance.max = target.value / 2
+  squareDistance.value = value <= squareDistance.max ? value : squareDistance.max
+}
 
 function startGame() {
   gameName.style.zIndex = 0
@@ -60,18 +66,22 @@ function toggleConfigMenu() {
 function updateGameConfig() {
   config.gameArea.width = document.getElementById('gameWidth').value
   config.gameArea.height = document.getElementById('gameHeight').value
-
   gameArea.style.width = config.gameArea.width + 'px'
   gameArea.style.height = config.gameArea.height + 'px'
+
+  config.square.size = parseFloat(document.getElementById('squareSize').value)
+  config.square.distance = parseFloat(document.getElementById('squareDistance').value)
+
+  config.pipe.size = parseFloat(document.getElementById('pipeSize').value)
+  config.pipe.width = parseFloat(document.getElementById('pipeWidth').value)
+  config.pipe.distance = parseFloat(document.getElementById('pipeDistance').value)
   configMenu.style.visibility = 'hidden'
 }
 
 function clearElements() {
   pipes.forEach(pipe => pipe.element.remove())
-  pipes.forEach(() => pipes.pop())
   pipes.length = 0
   squares.forEach(square => square.element.remove())
-  squares.forEach(() => squares.pop())
   squares.length = 0
 }
 
