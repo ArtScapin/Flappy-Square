@@ -24,18 +24,26 @@ const squares = []
 const pipes = []
 
 const gameName = document.getElementById('gameName')
-
 const gameArea = document.getElementById('gameArea')
+
 gameArea.style.width = config.gameArea.width + 'px'
 gameArea.style.height = config.gameArea.height + 'px'
 
 const playButton = document.getElementById('playBtn')
-playButton.onclick = () => {
+const configButton = document.getElementById('configBtn')
+const configMenu = document.getElementById('configMenu')
+const closeMenuConfigBtn = document.getElementById('closeMenuConfigBtn')
+const score = document.getElementById('scoreValue')
+
+playButton.onclick = startGame
+configButton.onclick = toggleConfigMenu
+closeMenuConfigBtn.onclick = updateGameConfig
+
+document.addEventListener('keydown', jump)
+
+function startGame() {
   gameName.style.zIndex = 0
-  pipes.forEach((pipe) => pipe.element.remove())
-  pipes.length = 0
-  squares.forEach((square) => square.element.remove())
-  squares.length = 0
+  clearElements()
   config.global.isGameOver = false
   createPipe()
   createSquare('GREEN')
@@ -45,30 +53,27 @@ playButton.onclick = () => {
   gameLoop()
 }
 
-const configButton = document.getElementById('configBtn')
-const configMenu = document.getElementById('configMenu')
-configButton.onclick = () => {
-  configMenu.style.visibility = 'visible'
+function toggleConfigMenu() {
+  configMenu.style.visibility = configMenu.style.visibility === 'visible' ? 'hidden' : 'visible'
 }
-const closeMenuConfigBtn = document.getElementById('closeMenuConfigBtn')
-closeMenuConfigBtn.onclick = () => {
+
+function updateGameConfig() {
   config.gameArea.width = document.getElementById('gameWidth').value
   config.gameArea.height = document.getElementById('gameHeight').value
-  // config.square.size = document.getElementById('squareSize').value
-  // config.square.distance = document.getElementById('squareDistance').value
-  // config.pipe.size = document.getElementById('pipeSize').value
-  // config.pipe.width = document.getElementById('pipeWidth').value
-  // config.pipe.velocity = document.getElementById('pipeVelocity').value
-  // config.pipe.distance = document.getElementById('pipeDistance').value
-  // config.global.gravity = document.getElementById('globalGravity').value
-  // config.global.lift = document.getElementById('globalLift').value
 
   gameArea.style.width = config.gameArea.width + 'px'
   gameArea.style.height = config.gameArea.height + 'px'
   configMenu.style.visibility = 'hidden'
 }
 
-const score = document.getElementById('scoreValue')
+function clearElements() {
+  pipes.forEach(pipe => pipe.element.remove())
+  pipes.forEach(() => pipes.pop())
+  pipes.length = 0
+  squares.forEach(square => square.element.remove())
+  squares.forEach(() => squares.pop())
+  squares.length = 0
+}
 
 function createSquare(color) {
   const square = {
@@ -89,7 +94,6 @@ function createSquare(color) {
   square.element.style.left = config.square.distance + 'px'
 
   gameArea.appendChild(square.element)
-
   squares.push(square)
 }
 
@@ -112,18 +116,16 @@ function createPipe() {
   pipe.element.style.left = pipe.position + 'px'
 
   gameArea.appendChild(pipe.element)
-
   pipes.push(pipe)
 }
 
-//refazer
 function jump() {
-  for (const square of squares) {
+  squares.forEach(square => {
     square.position += config.global.lift
     if (square.position > config.gameArea.height)
       square.position = config.gameArea.height
     square.velocity = 0
-  }
+  })
 }
 
 function gravityForce(square) {
@@ -135,17 +137,14 @@ function gravityForce(square) {
   }
 }
 
-document.addEventListener('keydown', jump)
-
 function gameLoop() {
   if (!config.global.isGameOver) {
     config.global.isGameOver = true
-    const pipe = pipes.find((pipe) => pipe.position < config.square.distance + config.square.size && pipe.position >= config.square.distance - config.pipe.width)
+    const pipe = pipes.find(pipe => pipe.position < config.square.distance + config.square.size && pipe.position >= config.square.distance - config.pipe.width)
 
-    for (const square of squares) {
+    squares.forEach(square => {
       if (!square.death) {
         gravityForce(square)
-
         square.element.style.bottom = square.position + 'px'
 
         if (pipe) {
@@ -157,16 +156,15 @@ function gameLoop() {
             square.score++
             score.innerText = square.score
           }
-
         }
       }
 
       if (!square.death) {
         config.global.isGameOver = false
       }
-    }
+    })
 
-    for (const pipe of pipes) {
+    pipes.forEach(pipe => {
       pipe.position -= config.pipe.velocity
 
       if (pipe.position == config.gameArea.width - config.pipe.distance)
@@ -178,7 +176,7 @@ function gameLoop() {
       }
 
       pipe.element.style.left = pipe.position + 'px'
-    }
+    })
 
     requestAnimationFrame(gameLoop)
   } else {
@@ -187,5 +185,3 @@ function gameLoop() {
     configButton.style.visibility = 'visible'
   }
 }
-
-gameLoop()
